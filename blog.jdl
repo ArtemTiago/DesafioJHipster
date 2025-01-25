@@ -1,0 +1,28 @@
+enum StatusCurso {
+  ATIVO, INATIVO
+}
+
+entity Curso {
+  nome String required,
+  descricao String,
+  status StatusCurso required,
+  dataCriacao Instant required,
+  dataInatividade Instant
+}
+
+entity Area {
+  nome String required,
+  descricao String,
+  status StatusCurso required,
+  dataCriacao Instant required,
+  dataInatividade Instant
+}
+
+relationship ManyToOne {
+  Curso{area} to Area
+}
+
+dto Curso, Area with mapstruct
+
+paginate Curso with infinite-scroll
+paginate Area with infinite-scroll

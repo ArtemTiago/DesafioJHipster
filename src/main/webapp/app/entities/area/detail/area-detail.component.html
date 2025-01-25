@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="area">
+      <h2 data-cy="areaDetailsHeading"><span jhiTranslate="blogApp.area.detail.title">Area</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">Código</span></dt>
+        <dd>
+          <span>{{ area.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="blogApp.area.nome">Nome</span></dt>
+        <dd>
+          <span>{{ area.nome }}</span>
+        </dd>
+        <dt><span jhiTranslate="blogApp.area.descricao">Descricao</span></dt>
+        <dd>
+          <span>{{ area.descricao }}</span>
+        </dd>
+        <dt><span jhiTranslate="blogApp.area.status">Status</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'blogApp.StatusCurso.' + area.status }}">{{ area.status }}</span>
+        </dd>
+        <dt><span jhiTranslate="blogApp.area.dataCriacao">Data Criacao</span></dt>
+        <dd>
+          <span>{{ area.dataCriacao | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="blogApp.area.dataInatividade">Data Inatividade</span></dt>
+        <dd>
+          <span>{{ area.dataInatividade | formatMediumDatetime }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+      </button>
+
+      <button type="button" [routerLink]="['/area', area.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+      </button>
+    </div>
+  </div>
+</div>

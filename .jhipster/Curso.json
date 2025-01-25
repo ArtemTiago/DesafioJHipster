@@ -1,0 +1,46 @@
+{
+  "applications": "*",
+  "changelogDate": "20250125165026",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "curso",
+  "fields": [
+    {
+      "fieldName": "nome",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "descricao",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "StatusCurso",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ATIVO,INATIVO"
+    },
+    {
+      "fieldName": "dataCriacao",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dataInatividade",
+      "fieldType": "Instant"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Curso",
+  "pagination": "infinite-scroll",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "area",
+      "relationshipName": "area",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

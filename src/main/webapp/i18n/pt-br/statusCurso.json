@@ -1,0 +1,9 @@
+{
+  "blogApp": {
+    "StatusCurso": {
+      "null": "",
+      "ATIVO": "ATIVO",
+      "INATIVO": "INATIVO"
+    }
+  }
+}

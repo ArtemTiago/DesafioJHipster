@@ -15,7 +15,7 @@
         [routerLink]="['/area/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="blogApp.area.home.createLabel"> Criar novo Area </span>
+        <span jhiTranslate="blogApp.area.home.createLabel"> Criar nova Área </span>
       </button>
     </div>
   </h2>
@@ -32,12 +32,6 @@
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
-          <th scope="col" jhiSortBy="id">
-            <div class="d-flex">
-              <span jhiTranslate="global.field.id">Código</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
           <th scope="col" jhiSortBy="nome">
             <div class="d-flex">
               <span jhiTranslate="blogApp.area.nome">Nome</span>
@@ -78,9 +72,6 @@
         [infiniteScrollDistance]="0"
       >
         <tr *ngFor="let area of areas; trackBy: trackId" data-cy="entityTable">
-          <td>
-            <a [routerLink]="['/area', area.id, 'view']">{{ area.id }}</a>
-          </td>
           <td>{{ area.nome }}</td>
           <td>{{ area.descricao }}</td>
           <td jhiTranslate="{{ 'blogApp.StatusCurso.' + area.status }}">{{ area.status }}</td>

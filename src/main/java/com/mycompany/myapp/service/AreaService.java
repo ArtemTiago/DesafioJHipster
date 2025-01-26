@@ -1,9 +1,11 @@
 package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Area;
+import com.mycompany.myapp.domain.enumeration.StatusCurso;
 import com.mycompany.myapp.repository.AreaRepository;
 import com.mycompany.myapp.service.dto.AreaDTO;
 import com.mycompany.myapp.service.mapper.AreaMapper;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +40,26 @@ public class AreaService {
      */
     public Mono<AreaDTO> save(AreaDTO areaDTO) {
         log.debug("Request to save Area : {}", areaDTO);
-        return areaRepository.save(areaMapper.toEntity(areaDTO)).map(areaMapper::toDto);
+
+        return isNomeDuplicado(areaDTO.getNome(), null)
+            .flatMap(isDuplicado -> {
+                if (isDuplicado) {
+                    return Mono.error(new RuntimeException("A área: '" + areaDTO.getNome() + "' já existe."));
+                } else {
+                    return areaRepository.save(areaMapper.toEntity(areaDTO)).map(areaMapper::toDto);
+                }
+            });
+    }
+
+    /**
+     * Verificar se o nome da área já existe, considerando o ID para não validar a área sendo editada.
+     *
+     * @param nome Nome da área.
+     * @param id   ID da área (pode ser null ao salvar nova área).
+     * @return Mono<Boolean> indicando se o nome já existe.
+     */
+    public Mono<Boolean> isNomeDuplicado(String nome, Long id) {
+        return areaRepository.findAll().filter(area -> area.getNome().equalsIgnoreCase(nome) && !area.getId().equals(id)).hasElements();
     }
 
     /**
@@ -49,7 +70,25 @@ public class AreaService {
      */
     public Mono<AreaDTO> update(AreaDTO areaDTO) {
         log.debug("Request to update Area : {}", areaDTO);
-        return areaRepository.save(areaMapper.toEntity(areaDTO)).map(areaMapper::toDto);
+
+        if (areaDTO.getStatus().equals(StatusCurso.INATIVO) && areaDTO.getDataInatividade() == null) {
+            areaDTO.setDataInatividade(Instant.now());
+        } else if (areaDTO.getStatus().equals(StatusCurso.ATIVO) && areaDTO.getDataInatividade() != null) {
+            areaDTO.setDataInatividade(null);
+        }
+
+        return isNomeDuplicado(areaDTO.getNome(), areaDTO.getId())
+            .flatMap(isDuplicado -> {
+                if (isDuplicado) {
+                    return Mono.error(new RuntimeException("A área: '" + areaDTO.getNome() + "' já existe."));
+                } else {
+                    return areaRepository.save(areaMapper.toEntity(areaDTO)).map(areaMapper::toDto);
+                }
+            });
+    }
+
+    private String getOriginalNome(Long areaId) {
+        return areaRepository.findById(areaId).map(Area::getNome).defaultIfEmpty("").block();
     }
 
     /**

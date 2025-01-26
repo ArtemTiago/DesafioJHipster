@@ -1,0 +1,15 @@
+.modal-dialog {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-header {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-
 import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import { IArea, NewArea } from '../area.model';
+import { StatusCurso } from 'app/entities/enumerations/status-curso.model';
 
 /**
  * A partial Type with required key is used as form input.
@@ -28,7 +28,9 @@ type AreaFormRawValue = FormValueOf<IArea>;
 
 type NewAreaFormRawValue = FormValueOf<NewArea>;
 
-type AreaFormDefaults = Pick<NewArea, 'id' | 'dataCriacao' | 'dataInatividade'>;
+type AreaFormDefaults = Pick<NewArea, 'id' | 'dataCriacao' | 'dataInatividade'> & {
+  status: StatusCurso | null;
+};
 
 type AreaFormGroupContent = {
   id: FormControl<AreaFormRawValue['id'] | NewArea['id']>;
@@ -76,21 +78,19 @@ export class AreaFormService {
 
   resetForm(form: AreaFormGroup, area: AreaFormGroupInput): void {
     const areaRawValue = this.convertAreaToAreaRawValue({ ...this.getFormDefaults(), ...area });
-    form.reset(
-      {
-        ...areaRawValue,
-        id: { value: areaRawValue.id, disabled: true },
-      } as any /* cast to workaround https://github.com/angular/angular/issues/46458 */
-    );
+    form.reset({
+      ...areaRawValue,
+      id: { value: areaRawValue.id, disabled: true },
+    } as any);
   }
 
   private getFormDefaults(): AreaFormDefaults {
     const currentTime = dayjs();
-
     return {
       id: null,
       dataCriacao: currentTime,
-      dataInatividade: currentTime,
+      dataInatividade: null,
+      status: StatusCurso.ATIVO,
     };
   }
 
@@ -98,7 +98,7 @@ export class AreaFormService {
     return {
       ...rawArea,
       dataCriacao: dayjs(rawArea.dataCriacao, DATE_TIME_FORMAT),
-      dataInatividade: dayjs(rawArea.dataInatividade, DATE_TIME_FORMAT),
+      dataInatividade: rawArea.dataInatividade ? dayjs(rawArea.dataInatividade, DATE_TIME_FORMAT) : null,
     };
   }
 
@@ -109,6 +109,7 @@ export class AreaFormService {
       ...area,
       dataCriacao: area.dataCriacao ? area.dataCriacao.format(DATE_TIME_FORMAT) : undefined,
       dataInatividade: area.dataInatividade ? area.dataInatividade.format(DATE_TIME_FORMAT) : undefined,
+      status: area.status || null,
     };
   }
 }

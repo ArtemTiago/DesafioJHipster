@@ -8,6 +8,8 @@ import { AreaFormService, AreaFormGroup } from './area-form.service';
 import { IArea } from '../area.model';
 import { AreaService } from '../service/area.service';
 import { StatusCurso } from 'app/entities/enumerations/status-curso.model';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ErrorModalComponent } from 'app/shared/modal/error-modal/error-modal.component';
 
 @Component({
   selector: 'jhi-area-update',
@@ -20,7 +22,12 @@ export class AreaUpdateComponent implements OnInit {
 
   editForm: AreaFormGroup = this.areaFormService.createAreaFormGroup();
 
-  constructor(protected areaService: AreaService, protected areaFormService: AreaFormService, protected activatedRoute: ActivatedRoute) {}
+  constructor(
+    protected areaService: AreaService,
+    protected areaFormService: AreaFormService,
+    protected activatedRoute: ActivatedRoute,
+    private modalService: NgbModal
+  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ area }) => {
@@ -48,7 +55,7 @@ export class AreaUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IArea>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
       next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
+      error: err => this.onSaveError(err),
     });
   }
 
@@ -56,8 +63,12 @@ export class AreaUpdateComponent implements OnInit {
     this.previousState();
   }
 
-  protected onSaveError(): void {
-    // Api for inheritance.
+  protected onSaveError(err: any): void {
+    const modalRef = this.modalService.open(ErrorModalComponent, {
+      centered: true,
+      size: 'lg',
+    });
+    modalRef.componentInstance.message = err?.error?.message || 'Ocorreu um erro desconhecido. Tente novamente mais tarde.';
   }
 
   protected onSaveFinalize(): void {

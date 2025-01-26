@@ -10,6 +10,8 @@ import { CursoService } from '../service/curso.service';
 import { IArea } from 'app/entities/area/area.model';
 import { AreaService } from 'app/entities/area/service/area.service';
 import { StatusCurso } from 'app/entities/enumerations/status-curso.model';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ErrorModalComponent } from 'app/shared/modal/error-modal/error-modal.component';
 
 @Component({
   selector: 'jhi-curso-update',
@@ -28,7 +30,8 @@ export class CursoUpdateComponent implements OnInit {
     protected cursoService: CursoService,
     protected cursoFormService: CursoFormService,
     protected areaService: AreaService,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    private modalService: NgbModal
   ) {}
 
   compareArea = (o1: IArea | null, o2: IArea | null): boolean => this.areaService.compareArea(o1, o2);
@@ -61,7 +64,7 @@ export class CursoUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ICurso>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
       next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
+      error: err => this.onSaveError(err),
     });
   }
 
@@ -69,8 +72,12 @@ export class CursoUpdateComponent implements OnInit {
     this.previousState();
   }
 
-  protected onSaveError(): void {
-    // Api for inheritance.
+  protected onSaveError(err: any): void {
+    const modalRef = this.modalService.open(ErrorModalComponent, {
+      centered: true,
+      size: 'lg',
+    });
+    modalRef.componentInstance.message = err?.error?.message || 'Ocorreu um erro desconhecido. Tente novamente mais tarde.';
   }
 
   protected onSaveFinalize(): void {

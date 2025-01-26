@@ -1,9 +1,11 @@
 package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Curso;
+import com.mycompany.myapp.domain.enumeration.StatusCurso;
 import com.mycompany.myapp.repository.CursoRepository;
 import com.mycompany.myapp.service.dto.CursoDTO;
 import com.mycompany.myapp.service.mapper.CursoMapper;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +40,26 @@ public class CursoService {
      */
     public Mono<CursoDTO> save(CursoDTO cursoDTO) {
         log.debug("Request to save Curso : {}", cursoDTO);
-        return cursoRepository.save(cursoMapper.toEntity(cursoDTO)).map(cursoMapper::toDto);
+
+        return isNomeDuplicado(cursoDTO.getNome(), null)
+            .flatMap(isDuplicado -> {
+                if (isDuplicado) {
+                    return Mono.error(new RuntimeException("O curso: '" + cursoDTO.getNome() + "' já existe."));
+                } else {
+                    return cursoRepository.save(cursoMapper.toEntity(cursoDTO)).map(cursoMapper::toDto);
+                }
+            });
+    }
+
+    /**
+     * Verificar se o nome do curso já existe, considerando o ID para não validar o curso sendo editado.
+     *
+     * @param nome Nome do curso.
+     * @param id   ID do curso (pode ser null ao salvar novo curso).
+     * @return Mono<Boolean> indicando se o nome já existe.
+     */
+    public Mono<Boolean> isNomeDuplicado(String nome, Long id) {
+        return cursoRepository.findAll().filter(curso -> curso.getNome().equalsIgnoreCase(nome) && !curso.getId().equals(id)).hasElements();
     }
 
     /**
@@ -49,7 +70,25 @@ public class CursoService {
      */
     public Mono<CursoDTO> update(CursoDTO cursoDTO) {
         log.debug("Request to update Curso : {}", cursoDTO);
-        return cursoRepository.save(cursoMapper.toEntity(cursoDTO)).map(cursoMapper::toDto);
+
+        if (cursoDTO.getStatus().equals(StatusCurso.INATIVO) && cursoDTO.getDataInatividade() == null) {
+            cursoDTO.setDataInatividade(Instant.now());
+        } else if (cursoDTO.getStatus().equals(StatusCurso.ATIVO) && cursoDTO.getDataInatividade() != null) {
+            cursoDTO.setDataInatividade(null);
+        }
+
+        return isNomeDuplicado(cursoDTO.getNome(), cursoDTO.getId())
+            .flatMap(isDuplicado -> {
+                if (isDuplicado) {
+                    return Mono.error(new RuntimeException("O curso: '" + cursoDTO.getNome() + "' já existe."));
+                } else {
+                    return cursoRepository.save(cursoMapper.toEntity(cursoDTO)).map(cursoMapper::toDto);
+                }
+            });
+    }
+
+    private String getOriginalNome(Long cursoId) {
+        return cursoRepository.findById(cursoId).map(Curso::getNome).defaultIfEmpty("").block();
     }
 
     /**

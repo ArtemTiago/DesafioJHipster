@@ -17,5 +17,6 @@ public interface CursoMapper extends EntityMapper<CursoDTO, Curso> {
     @Named("areaId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "nome", source = "nome")
     AreaDTO toDtoAreaId(Area area);
 }

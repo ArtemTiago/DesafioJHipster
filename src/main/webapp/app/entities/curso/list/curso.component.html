@@ -32,12 +32,6 @@
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
-          <th scope="col" jhiSortBy="id">
-            <div class="d-flex">
-              <span jhiTranslate="global.field.id">Código</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
           <th scope="col" jhiSortBy="nome">
             <div class="d-flex">
               <span jhiTranslate="blogApp.curso.nome">Nome</span>
@@ -84,9 +78,6 @@
         [infiniteScrollDistance]="0"
       >
         <tr *ngFor="let curso of cursos; trackBy: trackId" data-cy="entityTable">
-          <td>
-            <a [routerLink]="['/curso', curso.id, 'view']">{{ curso.id }}</a>
-          </td>
           <td>{{ curso.nome }}</td>
           <td>{{ curso.descricao }}</td>
           <td jhiTranslate="{{ 'blogApp.StatusCurso.' + curso.status }}">{{ curso.status }}</td>
@@ -94,7 +85,9 @@
           <td>{{ curso.dataInatividade | formatMediumDatetime }}</td>
           <td>
             <div *ngIf="curso.area">
-              <a [routerLink]="['/area', curso.area.id, 'view']">{{ curso.area.id }}</a>
+              <a [routerLink]="['/area', curso.area.id, 'view']" style="color: black; font-weight: normal; text-decoration: none">{{
+                curso.area?.nome
+              }}</a>
             </div>
           </td>
           <td class="text-end">
